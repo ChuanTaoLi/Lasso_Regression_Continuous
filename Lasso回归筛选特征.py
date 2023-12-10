@@ -4,11 +4,12 @@ import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 import seaborn as sns
 from sklearn.preprocessing import StandardScaler
+from sklearn.linear_model import Lasso
+from statsmodels.stats.outliers_influence import variance_inflation_factor
 plt.rcParams['font.sans-serif'] = ['SimHei']
 plt.rcParams['axes.unicode_minus'] = False
-from sklearn.linear_model import Lasso
+
 data = pd.read_excel(r"D:\0文献整理\网络入侵检测\KDD99\KDD_train.xlsx")
-from statsmodels.stats.outliers_influence import variance_inflation_factor
 
 '''计算VIF函数'''
 def calculate_vif(df):
@@ -23,6 +24,7 @@ lasso_model = Lasso(alpha=0.055, fit_intercept=True,
                    precompute=False, copy_X=True,
                    max_iter=10000, tol=0.0001, warm_start=False,
                    positive=False, random_state=None, selection='cyclic')
+
 lasso_model.fit(X, y)  # X 和 y 是你的特征和目标变量
 selected_features = X.columns[lasso_model.coef_ != 0]
 print(selected_features)
@@ -42,5 +44,7 @@ vif_after["VIF"] = [variance_inflation_factor(X_train_selected.values, i) for i 
 print("筛选特征后的VIF:")
 print(vif_after)
 
-vif_before.to_excel(r'D:\0文献整理\网络入侵检测\KDD99\vif_before.xlsx',index=False)
+# vif_before.to_excel(r'D:\0文献整理\网络入侵检测\KDD99\vif_before.xlsx',index=False)
+data_selected = data[selected_features.tolist() + ['label']]
 vif_after.to_excel(r'D:\0文献整理\网络入侵检测\KDD99\vif_after_alpha0.055.xlsx',index=False)
+data_selected.to_excel(r'D:\0文献整理\网络入侵检测\KDD99\data_selected_alpha0.055.xlsx',index=False)
